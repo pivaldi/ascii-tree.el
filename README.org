@@ -78,7 +78,7 @@ A buffer named =*ascii-tree-export-FILENAME*= opens with the tree output.
 
 * Converting Tree Text to Org-mode
 
-=ascii-tree-convert= does the reverse: converts tree-structured text (like output
+=ascii-tree-import= does the reverse: converts tree-structured text (like output
 from the =tree= command) into org-mode format.
 
 ** Usage
@@ -86,10 +86,10 @@ from the =tree= command) into org-mode format.
 Open any buffer containing tree-structured text (or select a region), then run:
 
 #+begin_example
-M-x ascii-tree-convert
+M-x ascii-tree-import
 #+end_example
 
-A buffer named =*ascii-tree-convert-result*= opens with org-mode formatted content.
+A buffer named =*ascii-tree-import-result*= opens with org-mode formatted content.
 
 ** Example
 
@@ -103,7 +103,7 @@ Given this tree text:
 │       └── go.mod
 #+end_example
 
-Running =M-x ascii-tree-convert= produces:
+Running =M-x ascii-tree-import= produces:
 
 #+begin_src org
 ,* service-manager/
@@ -121,6 +121,37 @@ The converter detects both subtitle formats:
 - =-- subtitle= (ascii-tree-export convention)
 
 Both are converted to org's =-- separator= format.
+
+** Real-World Example with Round-Trip
+
+The =tests/= directory contains a complete example demonstrating round-trip conversion:
+
+- [[file:tests/mock.txt][tests/mock.txt]] - Tree-structured project architecture (310 lines)
+- [[file:tests/mock.org][tests/mock.org]] - Converted org-mode format
+
+This example demonstrates:
+
+1. *Import* (=M-x ascii-tree-import=): Converts =mock.txt= tree to org-mode
+2. *Export* (=M-x ascii-tree-export=): Converts the org file back to tree format
+3. *Round-trip preservation*: Structure and depth are preserved through the cycle
+
+*** Key Features Demonstrated
+
+*Alignment space handling*: The original tree may contain visual alignment spaces
+for readability. These are automatically ignored during depth calculation:
+
+#+begin_example
+│   ├── definitions/          # Contract Definitions
+│   │   │                     # ZERO dependencies (alignment spaces ignored)
+│   │   ├── serviceasvc/      # Service A public API
+│   │   │   │                 # Dependencies: ZERO (alignment spaces)
+#+end_example
+
+*Deep content nesting*: Content can be multiple levels deeper than its parent
+headline, and this depth offset is preserved through round-trip conversion.
+
+*Inline comments*: Lines starting with =#= are treated as org comments but their
+depth information is preserved using leading spaces in the org representation.
 
 * Configuration
 

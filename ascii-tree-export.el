@@ -63,15 +63,13 @@ Otherwise renders as \"PREFIX Title\"."
 (defun ascii-tree-export--content-prefix (spine)
   "Build the indentation prefix for content lines under a headline.
 SPINE is the same list used in `ascii-tree-export--build-prefix'.
-Unlike headlines, content lines use no connector — just │   or spaces.
-Uses only ancestors (not the current node) to match headline depth."
+Content lines show continuation bars based on ALL spine positions (including current node).
+If the current headline is not the last sibling, content shows │ continuation."
   (if (null spine)
       ""
-    (let ((ancestors (butlast spine))
-          (is-last (car (last spine))))
-      (mapconcat (lambda (last-p) (if last-p "    " "│   "))
-                 ancestors
-                 ""))))
+    (mapconcat (lambda (last-p) (if last-p "    " "│   "))
+               spine
+               "")))
 
 (defun ascii-tree-export--format-content (node spine source-buffer)
   "Format content NODE into a list of indented strings using SPINE.
@@ -117,16 +115,20 @@ Strips : prefix from fixed-width/example lines."
          (lines  (split-string (string-trim-right raw) "\n")))
     (mapcar (lambda (line)
               ;; Detect leading spaces and convert to extra tree depth
-              (if (string-match "^\\( *\\): \\(.*\\)" line)
+              ;; Match ": " or ":" (space after colon is optional for empty lines)
+              (if (string-match "^\\( *\\):\\(?: \\(.*\\)\\)?$" line)
                   ;; Line has : prefix (fixed-width) - preserve spaces before :
                   (let* ((leading-spaces (match-string 1 line))
-                         (text (match-string 2 line))
+                         (text (or (match-string 2 line) ""))  ; Empty if no match
                          (extra-levels (/ (length leading-spaces) 4))
                          (full-prefix (concat base-prefix
                                             (mapconcat (lambda (_) "│   ")
                                                       (number-sequence 1 extra-levels)
                                                       ""))))
-                    (concat full-prefix text))
+                    ;; If text is empty, this is an empty tree line (│) for spacing
+                    (if (string-empty-p text)
+                        (string-trim-right full-prefix)  ; Just the vertical bars, no trailing spaces
+                      (concat full-prefix text)))
                 (if (string-match "^\\( *\\)\\(.*\\)" line)
                     ;; Regular line with possible leading spaces
                     (let* ((leading-spaces (match-string 1 line))
@@ -163,12 +165,18 @@ Call with the root parse tree and an empty spine: (ascii-tree-export--walk tree 
     (let ((n (length headlines)))
       (seq-do-indexed
        (lambda (hl idx)
-         (let* ((is-last  (= idx (1- n)))
-                (new-spine (append spine (list is-last)))
-                (hl-line   (ascii-tree-export--format-headline hl new-spine)))
+         (let* ((hl-level (org-element-property :level hl))
+                (is-last  (= idx (1- n)))
+                ;; Tree command compatibility: level-1 headlines are root titles (no connector)
+                ;; Format with empty spine, walk with empty spine (children build from scratch)
+                (format-spine (if (= hl-level 1) '() (append spine (list is-last))))
+                (child-spine  (if (= hl-level 1)
+                                  '()  ; Level-1's children start with empty spine
+                                (append spine (list is-last))))
+                (hl-line      (ascii-tree-export--format-headline hl format-spine)))
            (with-current-buffer buffer
              (insert hl-line "\n"))
-           (ascii-tree-export--walk hl new-spine buffer source-buffer)))
+           (ascii-tree-export--walk hl child-spine buffer source-buffer)))
        headlines))))
 
 (defun ascii-tree-export--md-parse-headings ()
@@ -309,18 +317,35 @@ If neither found, entire TEXT is the title (subtitle is nil)."
 Classifies lines as headlines (with connectors ├── or └──, or no tree chars) or content.
 Lines without any tree characters are treated as root-level headlines.
 Content lines are accumulated under the current headline.
-CONTENT-LINES is a list of (CONTENT-DEPTH . TEXT) cons pairs to preserve indentation."
-  (let (result current-headline)
+CONTENT-LINES is a list of (CONTENT-DEPTH . TEXT) cons pairs to preserve indentation.
+
+Tree command compatibility: If input starts with a root title line (no tree chars),
+all subsequent connector-based depths are incremented by 1 to make them children."
+  (let (result current-headline
+        ;; Detect if first non-empty line is a root title (tree command format)
+        (has-root-title nil)
+        (first-line-checked nil))
     (dolist (line lines)
       (let ((trimmed (string-trim line)))
         (unless (string-empty-p trimmed)
+          ;; Check first non-empty line for root title detection
+          (unless first-line-checked
+            (setq first-line-checked t)
+            (when (not (string-match-p "[│├└─]" trimmed))
+              (setq has-root-title t)))
+
           (let* ((stripped (ascii-tree-import--strip-tree-chars line))
-                 (depth (car stripped))
+                 (base-depth (car stripped))
                  (text (cdr stripped))
                  (has-connector (string-match-p "[├└]──" line))
                  (has-tree-chars (string-match-p "[│├└─]" line))
                  ;; A line is a headline if it has a connector OR has no tree chars at all
-                 (is-headline (or has-connector (not has-tree-chars))))
+                 (is-headline (or has-connector (not has-tree-chars)))
+                 ;; Adjust depth: if we have root title and this line has a connector,
+                 ;; increment depth by 1 to make it a child of root
+                 (depth (if (and has-root-title has-connector)
+                            (1+ base-depth)
+                          base-depth)))
             (if is-headline
                 (progn
                   ;; Save previous headline
@@ -334,8 +359,9 @@ CONTENT-LINES is a list of (CONTENT-DEPTH . TEXT) cons pairs to preserve indenta
                   (let ((parsed (ascii-tree-import--parse-headline text)))
                     (setq current-headline
                           (list depth (car parsed) (cdr parsed) '()))))
-              ;; Content line - append to current headline with depth (skip empty content)
-              (when (and current-headline (not (string-empty-p text)))
+              ;; Content line - append to current headline with depth
+              ;; Note: empty text represents empty tree lines (│) for spacing
+              (when current-headline
                 (push (cons depth text) (nth 3 current-headline))))))))
     ;; Don't forget the last headline
     (when current-headline
