@@ -15,17 +15,16 @@
 (require 'cl-lib)
 
 (defun ascii-tree-to-org (start end)
-  "Convert an ASCII tree structure to Org-mode format.
-Handles both standard pipe indentation and space-based terminal nodes.
-The result is placed in a new buffer called *ascii-tree-org*."
+  "Convert an ASCII tree structure to Org-mode format."
   (interactive "r")
   (let* ((text (buffer-substring-no-properties start end))
+         (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
          (output-buf (get-buffer-create "*ascii-tree-org*"))
          (accum nil)
-         (flush-accum
+         (flush-accum 
           (lambda ()
-            (save-match-data
+            (save-match-data 
               (when accum
                 (with-current-buffer output-buf
                   (setq accum (nreverse accum))
@@ -36,17 +35,12 @@ The result is placed in a new buffer called *ascii-tree-org*."
                         (setq in-code-block t)
                         (let ((lang (match-string 1 line)))
                           (insert "#+BEGIN_SRC " (if (string= lang "") "" lang) "\n")))
-
                        ((string-match-p "^[ \t\240]*\\[endcode\\][ \t\240]*$" line)
                         (setq in-code-block nil)
                         (insert "#+END_SRC\n"))
-
                        ((string-match-p "^[ \t\240]*$" line)
-                        ;; The 4-space padding remains removed so the ':' is flush left!
                         (if in-code-block (insert "\n") (insert ":\n")))
-
-                       (t
-                        (insert line "\n")))))
+                       (t (insert line "\n")))))
                   (setq accum nil)))))))
 
     (with-current-buffer output-buf
@@ -55,7 +49,6 @@ The result is placed in a new buffer called *ascii-tree-org*."
 
     (dolist (line lines)
       (cond
-       ;; 1. Match Tree Node
        ((string-match "^\\([│ \t\240]*\\)[├└]──[ \t\240]*\\([^ \t\240#]+\\)\\([ \t\240]*#[ \t\240]*\\(.*\\)\\)?$" line)
         (let* ((prefix (match-string 1 line))
                (file (match-string 2 line))
@@ -63,32 +56,21 @@ The result is placed in a new buffer called *ascii-tree-org*."
                (clean-prefix (replace-regexp-in-string "[\t]" "    " prefix))
                (clean-prefix (replace-regexp-in-string "[\240]" " " clean-prefix))
                (level (1+ (/ (length clean-prefix) 4))))
-
           (funcall flush-accum)
           (with-current-buffer output-buf
-            (unless (= (point-min) (point-max))
-              (insert "\n"))
+            ;; FIX: Removed artificial padding here too
             (if desc
                 (insert (make-string level ?*) " " file " -- " desc "\n")
               (insert (make-string level ?*) " " file "\n")))))
-
-       ;; 2. Match continuation content
        ((string-match "^[│ \t\240]*#[ \t\240]?\\(.*\\)$" line)
         (push (match-string 1 line) accum))
-
-       ;; 3. Match pure structure lines or completely blank lines
-       ;; FIX: We push "" to accum so flush-accum generates the ':' marker
        ((string-match-p "^[│ \t\240]*$" line)
+        ;; FIX: Restored the push to accumulator so Org generates `:` markers
         (push "" accum))
-
-       ;; 4. Match Root Title
-       ((and (not (string-match-p "[│├└#]" line))
-             (not (string-match-p "^[ \t\240]*$" line)))
+       ((and (not (string-match-p "[│├└#]" line)) (not (string-match-p "^[ \t\240]*$" line)))
         (let ((title (replace-regexp-in-string "\\`[ \t\240\n\r]+\\|[ \t\240\n\r]+\\'" "" line)))
           (funcall flush-accum)
-          (with-current-buffer output-buf
-            (insert "#+title: " title "\n"))))))
-
+          (with-current-buffer output-buf (insert "#+title: " title "\n"))))))
     (funcall flush-accum)
     (switch-to-buffer output-buf)))
 
@@ -233,17 +215,16 @@ The result is placed in a new buffer called *ascii-tree-tree*."
     (switch-to-buffer output-buf)))
 
 (defun ascii-tree-to-md (start end)
-  "Convert an ASCII tree structure to Markdown format.
-Handles both standard pipe indentation and space-based terminal nodes.
-The result is placed in a new buffer called *ascii-tree-md*."
+  "Convert an ASCII tree structure to Markdown format."
   (interactive "r")
   (let* ((text (buffer-substring-no-properties start end))
+         (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
          (output-buf (get-buffer-create "*ascii-tree-md*"))
          (accum nil)
-         (flush-accum
+         (flush-accum 
           (lambda ()
-            (save-match-data
+            (save-match-data 
               (when accum
                 (with-current-buffer output-buf
                   (setq accum (nreverse accum))
@@ -254,18 +235,12 @@ The result is placed in a new buffer called *ascii-tree-md*."
                         (setq in-code-block t)
                         (let ((lang (match-string 1 line)))
                           (insert "```" (if (string= lang "") "" lang) "\n")))
-
                        ((string-match-p "^[ \t\240]*\\[endcode\\][ \t\240]*$" line)
                         (setq in-code-block nil)
                         (insert "```\n"))
-
                        ((string-match-p "^[ \t\240]*$" line)
-                        ;; Removed the 4-space padding for the empty line marker
                         (if in-code-block (insert "\n") (insert ":\n")))
-
-                       (t
-                        ;; Removed the 4-space padding for standard text
-                        (insert line "\n")))))
+                       (t (insert line "\n")))))
                   (setq accum nil)))))))
 
     (with-current-buffer output-buf
@@ -274,7 +249,6 @@ The result is placed in a new buffer called *ascii-tree-md*."
 
     (dolist (line lines)
       (cond
-       ;; 1. Match Tree Node
        ((string-match "^\\([│ \t\240]*\\)[├└]──[ \t\240]*\\([^ \t\240#]+\\)\\([ \t\240]*#[ \t\240]*\\(.*\\)\\)?$" line)
         (let* ((prefix (match-string 1 line))
                (file (match-string 2 line))
@@ -282,31 +256,21 @@ The result is placed in a new buffer called *ascii-tree-md*."
                (clean-prefix (replace-regexp-in-string "[\t]" "    " prefix))
                (clean-prefix (replace-regexp-in-string "[\240]" " " clean-prefix))
                (level (1+ (/ (length clean-prefix) 4))))
-
           (funcall flush-accum)
           (with-current-buffer output-buf
+            ;; FIX: Removed the artificial \n padding to guarantee idempotency
             (if desc
                 (insert (make-string (1+ level) ?#) " " file " -- " desc "\n")
               (insert (make-string (1+ level) ?#) " " file "\n")))))
-
-       ;; 2. Match continuation content
        ((string-match "^[│ \t\240]*#[ \t\240]?\\(.*\\)$" line)
         (push (match-string 1 line) accum))
-
-       ;; 3. Match pure structure lines or completely blank lines
        ((string-match-p "^[│ \t\240]*$" line)
         (funcall flush-accum)
-        (with-current-buffer output-buf
-          (insert "\n")))
-
-       ;; 4. Match Root Title
-       ((and (not (string-match-p "[│├└#]" line))
-             (not (string-match-p "^[ \t\240]*$" line)))
+        (with-current-buffer output-buf (insert "\n")))
+       ((and (not (string-match-p "[│├└#]" line)) (not (string-match-p "^[ \t\240]*$" line)))
         (let ((title (replace-regexp-in-string "\\`[ \t\240\n\r]+\\|[ \t\240\n\r]+\\'" "" line)))
           (funcall flush-accum)
-          (with-current-buffer output-buf
-            (insert "# " title "\n"))))))
-
+          (with-current-buffer output-buf (insert "# " title "\n"))))))
     (funcall flush-accum)
     (switch-to-buffer output-buf)))
 
