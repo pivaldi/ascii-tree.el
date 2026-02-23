@@ -35,9 +35,9 @@
          (lines (split-string text "\n"))
          (output-buf (get-buffer-create "*ascii-tree-org*"))
          (accum nil)
-         (flush-accum 
+         (flush-accum
           (lambda ()
-            (save-match-data 
+            (save-match-data
               (when accum
                 (with-current-buffer output-buf
                   (setq accum (nreverse accum))
@@ -76,14 +76,17 @@
               (insert (make-string level ?*) " " file "\n")))))
        ((string-match "^[│[:blank:]]*#[[:blank:]]?\\(.*\\)$" line)
         (push (match-string 1 line) accum))
+
+       ;; FIX: Now perfectly synced with the Markdown version!
        ((string-match-p "^[│[:blank:]]*$" line)
-        (push "" accum))
+        (funcall flush-accum)
+        (with-current-buffer output-buf (insert "\n")))
+
        ((and (not (string-match-p "[│├└#]" line)) (not (string-match-p "^[[:blank:]]*$" line)))
         (let ((title (replace-regexp-in-string "\\`[[:space:]]+\\|[[:space:]]+\\'" "" line)))
           (funcall flush-accum)
           (with-current-buffer output-buf (insert "#+title: " title "\n"))))
        (t
-        ;; SAFETY NET: If parsing fails entirely, preserve the raw text!
         (funcall flush-accum)
         (with-current-buffer output-buf (insert line "\n")))))
     (funcall flush-accum)
@@ -168,9 +171,9 @@
             (setq in-code-block t)
             (with-current-buffer output-buf (insert (funcall make-prefix 'text idx) "#[code " (match-string 1 line) "]\n")))
            ((and (not in-code-block) (string-match "^\\(\\*+\\)[[:blank:]]+\\(.*?\\)\\([[:blank:]]+--[[:blank:]]*\\(.*\\)\\)?[[:blank:]]*$" line))
-            (let* ((stars (match-string 1 line)) 
-                   (file (replace-regexp-in-string "[[:blank:]]+\\'" "" (match-string 2 line))) 
-                   (desc (match-string 4 line)) 
+            (let* ((stars (match-string 1 line))
+                   (file (replace-regexp-in-string "[[:blank:]]+\\'" "" (match-string 2 line)))
+                   (desc (match-string 4 line))
                    (level (length stars)))
               (setq current-level level)
               (aset is-last-at-level level (gethash idx last-sibling-hash))
@@ -197,9 +200,9 @@
          (lines (split-string text "\n"))
          (output-buf (get-buffer-create "*ascii-tree-md*"))
          (accum nil)
-         (flush-accum 
+         (flush-accum
           (lambda ()
-            (save-match-data 
+            (save-match-data
               (when accum
                 (with-current-buffer output-buf
                   (setq accum (nreverse accum))
@@ -329,9 +332,9 @@
             (setq in-code-block t)
             (with-current-buffer output-buf (insert (funcall make-prefix 'text idx) "#[code " (match-string 1 line) "]\n")))
            ((and (not in-code-block) (string-match "^\\(#+\\)[[:blank:]]+\\(.*?\\)\\([[:blank:]]+--[[:blank:]]*\\(.*\\)\\)?[[:blank:]]*$" line))
-            (let* ((hashes (match-string 1 line)) 
-                   (file (replace-regexp-in-string "[[:blank:]]+\\'" "" (match-string 2 line))) 
-                   (desc (match-string 4 line)) 
+            (let* ((hashes (match-string 1 line))
+                   (file (replace-regexp-in-string "[[:blank:]]+\\'" "" (match-string 2 line)))
+                   (desc (match-string 4 line))
                    (level (1- (length hashes))))
               (if (= level 0)
                   (with-current-buffer output-buf (insert file (if desc (concat "  # " desc) "") "\n"))

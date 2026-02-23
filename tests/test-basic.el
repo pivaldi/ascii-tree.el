@@ -19,7 +19,7 @@
 #+BEGIN_SRC go
 module example.com/service
 #+END_SRC
-:
+
 * no-desc-dir/
 ** blank.txt\n")
          (input-buf (generate-new-buffer "*test-tree-input*")))
