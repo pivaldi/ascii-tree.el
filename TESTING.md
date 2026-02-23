@@ -1,4 +1,4 @@
-# Testing ascii-tree-export
+# Testing ascii-tree
 
 ## Quick Start
 
@@ -55,13 +55,13 @@ Failed: 0
 
 ### ERT tests only:
 ```bash
-emacs --batch -L . -l ert -l ascii-tree-export.el \
+emacs --batch -L . -l ert -l ascii-tree.el \
   -l tests/test-basic.el -f ert-run-tests-batch-and-exit
 ```
 
 ### Roundtrip test only:
 ```bash
-emacs --batch -L . -l ert -l ascii-tree-export.el \
+emacs --batch -L . -l ert -l ascii-tree.el \
   -l tests/test-roundtrip-mock.el -f ert-run-tests-batch-and-exit
 ```
 

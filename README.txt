@@ -1,4 +1,4 @@
-#+title: ascii-tree-export
+#+title: ascii-tree
 #+author: Philippe IVALDI
 #+language: en
 Export an =org-mode= or =markdown= buffer as an ASCII tree into a dedicated buffer.
@@ -16,7 +16,7 @@ Export an =org-mode= or =markdown= buffer as an ASCII tree into a dedicated buff
 │   │   ** Normal mode
 │   │   ** Insert mode
 │   │   #+end_src
-│   │   Running =M-x ascii-tree-export= produces:
+│   │   Running =M-x ascii-tree= produces:
 │   │   #+begin_example
 │   │   ├── Emacs
 │   │   │   ├── Editor # core editing
@@ -33,36 +33,36 @@ Export an =org-mode= or =markdown= buffer as an ASCII tree into a dedicated buff
 │       See file [[file:README.txt][README.txt]] exported from this README.org…
 ├── Installation
 │   ├── Manual
-│   │   Clone or download =ascii-tree-export.el= and add it to your load path:
+│   │   Clone or download =ascii-tree.el= and add it to your load path:
 │   │   #+begin_src emacs-lisp
-│   │   (add-to-list 'load-path "/path/to/ascii-tree-export")
-│   │   (require 'ascii-tree-export)
+│   │   (add-to-list 'load-path "/path/to/ascii-tree")
+│   │   (require 'ascii-tree)
 │   │   #+end_src
 │   ├── package-vc (Emacs 29+)
 │   │   #+begin_src emacs-lisp
-│   │   (package-vc-install "https://github.com/pivaldi/ascii-tree-export")
+│   │   (package-vc-install "https://github.com/pivaldi/ascii-tree")
 │   │   #+end_src
 │   └── use-package + straight
 │       #+begin_src emacs-lisp
-│       (use-package ascii-tree-export
-│         :straight (:host github :repo "pivaldi/ascii-tree-export"))
+│       (use-package ascii-tree
+│         :straight (:host github :repo "pivaldi/ascii-tree"))
 │       #+end_src
 ├── Usage
 │   Open any =.org= or =.md= file and run:
 │   #+begin_example
-│   M-x ascii-tree-export
+│   M-x ascii-tree
 │   #+end_example
-│   A buffer named =*ascii-tree-export-FILENAME*= opens with the tree output.
+│   A buffer named =*ascii-tree-FILENAME*= opens with the tree output.
 ├── Configuration
 │   └── Subtitle separator
 │       Headlines of the form =Title -- Subtitle= are rendered as =Title # Subtitle= in
 │       the tree. The separator string is configurable:
 │       #+begin_src emacs-lisp
 │       ;; Default: " -- "
-│       (setq ascii-tree-export-subtitle-separator " -- ")
+│       (setq ascii-tree-subtitle-separator " -- ")
 │
 │       ;; Legacy pipe convention
-│       (setq ascii-tree-export-subtitle-separator " | ")
+│       (setq ascii-tree-subtitle-separator " | ")
 │       #+end_src
 ├── Supported formats
 │   | Format   | Headlines | Paragraphs | Lists | Src blocks | Tables |

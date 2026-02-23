@@ -6,7 +6,7 @@ service-manager/
 │
 ├── buf.yaml                   # Buf workspace config (lint/breaking rules across all modules)
 │
-├── contracts/                # Unified contracts module
+├── contracts/                 # Unified contracts module
 │   ├── go.mod                # Module: github.com/example/service-manager/contracts
 │   ├── buf.gen.yaml          # Code generation config (run `buf generate` from here)
 │   ├── README.md             # Contract versioning strategy
@@ -21,16 +21,18 @@ service-manager/
 │   │   │   ├── README.md     # Contract usage documentation
 │   │   │   │
 │   │   │   ├── api.go        # Public service interface
+│   │   │   │   #[code go]
 │   │   │   │   # type ServiceAService interface {
 │   │   │   │   #   GetServiceA(ctx, id) (*ServiceADTO, error)
 │   │   │   │   #   CreateServiceA(ctx, req) (*ServiceADTO, error)
 │   │   │   │   # }
+│   │   │   │   #[endcode]
 │   │   │   │
 │   │   │   ├── dto.go        # Domain-friendly DTOs
 │   │   │   │   # type ServiceADTO struct { ID, Name, Bio string }
 │   │   │   │
 │   │   │   ├── errors.go     # Public error types
-│   │   │   │   # var ErrServiceANotFound = errors.New("entity not found")
+│   │   │   │   # var ErrServiceANotFound = errors.New(\"entity not found\")
 │   │   │   │
 │   │   │   └── inproc_client.go  # In-process client (thin wrapper)
 │   │   │       # Implements ServiceAService interface
@@ -101,19 +103,19 @@ service-manager/
 │   │       │   │             # No adapters, no infrastructure
 │   │       │   │
 │   │       │   ├── user/     # User aggregate
-│   │       │   │   ├── user.go           # Entity (aggregate root)
-│   │       │   │   ├── user_test.go      # UNIT TEST
-│   │       │   │   ├── email.go          # Value object
-│   │       │   │   ├── email_test.go     # UNIT TEST
-│   │       │   │   ├── password.go       # Value object
-│   │       │   │   ├── password_test.go  # UNIT TEST
-│   │       │   │   └── repository.go     # Repository interface (port)
+│   │       │   │   ├── user.go            # Entity (aggregate root)
+│   │       │   │   ├── user_test.go       # UNIT TEST
+│   │       │   │   ├── email.go           # Value object
+│   │       │   │   ├── email_test.go      # UNIT TEST
+│   │       │   │   ├── password.go        # Value object
+│   │       │   │   ├── password_test.go   # UNIT TEST
+│   │       │   │   └── repository.go      # Repository interface (port)
 │   │       │   │
 │   │       │   ├── session/  # Session aggregate
-│   │       │   │   ├── session.go        # Entity
-│   │       │   │   ├── session_test.go   # UNIT TEST
-│   │       │   │   ├── token.go          # Value object
-│   │       │   │   └── repository.go     # Repository interface
+│   │       │   │   ├── session.go         # Entity
+│   │       │   │   ├── session_test.go    # UNIT TEST
+│   │       │   │   ├── token.go           # Value object
+│   │       │   │   └── repository.go      # Repository interface
 │   │       │   │
 │   │       │   └── errors.go # Domain errors
 │   │       │
@@ -144,9 +146,11 @@ service-manager/
 │   │       │       │         # Implemented by adapters
 │   │       │       │
 │   │       │       ├── servicea_client.go  # Outbound port
+│   │       │       │   #[code go]
 │   │       │       │   # type ServiceAClient interface {
 │   │       │       │   #   GetEntityA(ctx, id) (*EntityA, error)
 │   │       │       │   # }
+│   │       │       │   #[endcode]
 │   │       │       │
 │   │       │       ├── cache.go          # Outbound port
 │   │       │       ├── logger.go         # Outbound port

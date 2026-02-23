@@ -1,4 +1,4 @@
-#+title: ascii-tree-export
+#+title: ascii-tree
 #+author: Philippe IVALDI
 #+language: en
 
@@ -22,7 +22,7 @@ Given this org file:
 ,** Insert mode
 #+end_src
 
-Running =M-x ascii-tree-export= produces:
+Running =M-x ascii-tree= produces:
 
 #+begin_example
 ├── Emacs
@@ -46,24 +46,24 @@ See file [[file:README.txt][README.txt]] exported from this README.org…
 
 ** Manual
 
-Clone or download =ascii-tree-export.el= and add it to your load path:
+Clone or download =ascii-tree.el= and add it to your load path:
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "/path/to/ascii-tree-export")
-(require 'ascii-tree-export)
+(add-to-list 'load-path "/path/to/ascii-tree")
+(require 'ascii-tree)
 #+end_src
 
 ** package-vc (Emacs 29+)
 
 #+begin_src emacs-lisp
-(package-vc-install "https://github.com/pivaldi/ascii-tree-export")
+(package-vc-install "https://github.com/pivaldi/ascii-tree")
 #+end_src
 
 ** use-package + straight
 
 #+begin_src emacs-lisp
-(use-package ascii-tree-export
-  :straight (:host github :repo "pivaldi/ascii-tree-export"))
+(use-package ascii-tree
+  :straight (:host github :repo "pivaldi/ascii-tree"))
 #+end_src
 
 * Usage
@@ -71,10 +71,10 @@ Clone or download =ascii-tree-export.el= and add it to your load path:
 Open any =.org= or =.md= file and run:
 
 #+begin_example
-M-x ascii-tree-export
+M-x ascii-tree
 #+end_example
 
-A buffer named =*ascii-tree-export-FILENAME*= opens with the tree output.
+A buffer named =*ascii-tree-FILENAME*= opens with the tree output.
 
 * Converting Tree Text to Org-mode
 
@@ -118,7 +118,7 @@ use (./contracts ./services/...)
 
 The converter detects both subtitle formats:
 - =# subtitle= (tree command convention)
-- =-- subtitle= (ascii-tree-export convention)
+- =-- subtitle= (ascii-tree convention)
 
 Both are converted to org's =-- separator= format.
 
@@ -132,7 +132,7 @@ The =tests/= directory contains a complete example demonstrating round-trip conv
 This example demonstrates:
 
 1. *Import* (=M-x ascii-tree-import=): Converts =mock.txt= tree to org-mode
-2. *Export* (=M-x ascii-tree-export=): Converts the org file back to tree format
+2. *Export* (=M-x ascii-tree=): Converts the org file back to tree format
 3. *Round-trip preservation*: Structure and depth are preserved through the cycle
 
 *** Key Features Demonstrated
@@ -162,10 +162,10 @@ the tree. The separator string is configurable:
 
 #+begin_src emacs-lisp
 ;; Default: " -- "
-(setq ascii-tree-export-subtitle-separator " -- ")
+(setq ascii-tree-subtitle-separator " -- ")
 
 ;; Legacy pipe convention
-(setq ascii-tree-export-subtitle-separator " | ")
+(setq ascii-tree-subtitle-separator " | ")
 #+end_src
 
 * Supported formats

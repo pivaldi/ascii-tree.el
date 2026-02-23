@@ -1,7 +1,7 @@
 ;;; test-roundtrip-mock.el --- True round-trip test for mock.txt -*- lexical-binding: t; -*-
 
 (require 'ert)
-(require 'ascii-tree-export)
+(require 'ascii-tree)
 
 (defun ascii-tree-test--normalize-alignment (line)
   "Remove alignment spaces (multiple spaces before #) for structural comparison."
@@ -36,15 +36,15 @@ Alignment spaces (extra spaces before comments) are normalized for comparison."
                (out-buf (get-buffer-create " *roundtrip-test*"))
                (src-buf (current-buffer)))
           (with-current-buffer out-buf (erase-buffer))
-          (ascii-tree-export--walk tree '() out-buf src-buf)
+          (ascii-tree--walk tree '() out-buf src-buf)
 
           ;; Step 4: Compare result to original
           (let* ((result-tree (with-current-buffer out-buf (buffer-string)))
                  ;; Split preserving empty lines (don't use OMIT-NULLS parameter!)
                  (original-lines (mapcar #'string-trim-right
-                                        (split-string original-tree "\n")))
+                                         (split-string original-tree "\n")))
                  (result-lines (mapcar #'string-trim-right
-                                      (split-string result-tree "\n")))
+                                       (split-string result-tree "\n")))
                  ;; Normalize alignment for structural comparison
                  (orig-normalized (mapcar #'ascii-tree-test--normalize-alignment original-lines))
                  (res-normalized (mapcar #'ascii-tree-test--normalize-alignment result-lines))
