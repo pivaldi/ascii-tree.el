@@ -4,12 +4,13 @@ Seamlessly convert ASCII directory trees into Markdown or Org-mode outlines, and
 
 `ascii-tree.el` bridges the gap between **architecture-as-code** and standard terminal outputs. It allows you to take standard `tree` command outputs, document them richly using Markdown or Org-mode, and convert them back into clean ASCII diagrams without losing structural integrity.
 
+![Demo](assets/demo.gif)
+
 ## ✨ Features
 
 * **100% Idempotent Round-Tripping:** Converting an ASCII Tree → Markdown/Org → ASCII Tree is completely lossless. No multiplied newlines, no phantom pipes, no shifting indentations.
 * **Smart Geometric Rendering:** The reverse parser uses forward-lookahead to perfectly rebuild terminal pipes (`│`, `├──`, `└──`), spacing, and structural blank lines.
 * **Extended Syntax Support:** Native support for inline file descriptions, multi-line continuations, and embedded code blocks right inside your ASCII tree.
-
 
 Refer to the complex example used to test the idempotency round-tripping of this package:
 * The tree version: [mock.txt](tests/mock.txt);
