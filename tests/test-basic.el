@@ -49,7 +49,7 @@ module example.com/service
 #+BEGIN_SRC go
 module example.com/service
 #+END_SRC
-:
+
 * src/
 ** main.go -- Main entrypoint")
 
@@ -59,7 +59,7 @@ module example.com/service
 │   #[code go]
 │   # module example.com/service
 │   #[endcode]
-│   #
+│
 └── src/
     └── main.go  # Main entrypoint\n")
 
