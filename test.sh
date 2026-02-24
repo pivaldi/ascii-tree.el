@@ -48,6 +48,7 @@ run_test() {
 
 run_test "Running Basic ERT Unit Tests" tests/test-basic.el
 run_test "Running idempotency ERT Unit Tests" tests/test-idempotency.el
+run_test "Running Whole Buffer ERT Unit Tests" tests/test-whole-buffer.el
 
 # Test Summary
 print_header "Test Summary"

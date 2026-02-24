@@ -38,18 +38,25 @@ The test suite includes:
 - Tests comment blocks (`#` prefix)
 - Ensures consecutive lines are not lost
 
+### 6. **Whole Buffer Operations** (`tests/test-whole-buffer.el`)
+- Tests all four functions when operating on whole buffer
+- Verifies functions work without active region
+- ~4 tests covering to-org, to-md, from-org, from-md
+
 ## Test Output
 
 ```
 ========================================
 Test Summary
 ========================================
-Total tests: 5
-Passed: 5
+Total tests: 3
+Passed: 3
 Failed: 0
 
 ✓ All tests passed!
 ```
+
+Note: The count represents test suites, not individual tests. The full suite runs 10 individual ERT tests.
 
 ## Running Individual Tests
 
@@ -63,6 +70,12 @@ emacs --batch -L . -l ert -l ascii-tree.el \
 ```bash
 emacs --batch -L . -l ert -l ascii-tree.el \
   -l tests/test-roundtrip-mock.el -f ert-run-tests-batch-and-exit
+```
+
+### Whole buffer tests only:
+```bash
+emacs --batch -L . -l ert -l ascii-tree.el \
+  -l tests/test-whole-buffer.el -f ert-run-tests-batch-and-exit
 ```
 
 ## CI/CD Integration
@@ -85,6 +98,7 @@ Perfect for continuous integration:
 ✓ Tree command compatibility
 ✓ Content tree prefixes (`│`)
 ✓ Roundtrip conversions (309/309 lines)
+✓ Whole buffer operations (no region active)
 
 ## Known Limitations
 

@@ -45,9 +45,9 @@ Download `ascii-tree.el`, place it in your `load-path`, and add this to your `in
 
 ## 🚀 Usage
 
-All commands operate on the **active region** (highlighted text).
+All commands operate on the **active region** (highlighted text), or on the **whole buffer** if no region is active.
 
-1. Select the ASCII tree (or the Markdown/Org block).
+1. Select the ASCII tree (or the Markdown/Org block), or leave no region active to process the entire buffer.
 2. Run the desired interactive command.
 3. The converted output is immediately placed into a new buffer (`*ascii-tree-md*`, `*ascii-tree-org*`, or `*ascii-tree-tree*`).
 

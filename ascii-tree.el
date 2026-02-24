@@ -28,8 +28,11 @@
 
 ;;;###autoload
 (defun ascii-tree-to-org (start end)
-  "Convert an ASCII tree structure to Org-mode format."
-  (interactive "r")
+  "Convert an ASCII tree structure to Org-mode format.
+If region is active, operates on region. Otherwise operates on whole buffer."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
   (let* ((text (buffer-substring-no-properties start end))
          (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
@@ -94,8 +97,11 @@
 
 ;;;###autoload
 (defun ascii-tree-from-org (start end)
-  "Convert an Org-mode tree back into an ASCII tree structure."
-  (interactive "r")
+  "Convert an Org-mode tree back into an ASCII tree structure.
+If region is active, operates on region. Otherwise operates on whole buffer."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
   (let* ((text (buffer-substring-no-properties start end))
          (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
@@ -193,8 +199,11 @@
 
 ;;;###autoload
 (defun ascii-tree-to-md (start end)
-  "Convert an ASCII tree structure to Markdown format."
-  (interactive "r")
+  "Convert an ASCII tree structure to Markdown format.
+If region is active, operates on region. Otherwise operates on whole buffer."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
   (let* ((text (buffer-substring-no-properties start end))
          (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
@@ -257,8 +266,11 @@
 
 ;;;###autoload
 (defun ascii-tree-from-md (start end)
-  "Convert a Markdown tree back into an ASCII tree structure."
-  (interactive "r")
+  "Convert a Markdown tree back into an ASCII tree structure.
+If region is active, operates on region. Otherwise operates on whole buffer."
+  (interactive (if (use-region-p)
+                   (list (region-beginning) (region-end))
+                 (list (point-min) (point-max))))
   (let* ((text (buffer-substring-no-properties start end))
          (text (replace-regexp-in-string "\n+\\'" "" text))
          (lines (split-string text "\n"))
