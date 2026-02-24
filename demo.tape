@@ -9,7 +9,7 @@ Set Shell zsh
 Require emacs
 Require tree
 Set FontSize 16
-# Set FontFamily "terminus"
+Set FontFamily "DejaVu Sans Mono"
 Set Width 1200
 Set Height 900
 Set TypingSpeed 0.08
@@ -27,9 +27,6 @@ Enter
 Sleep 2s
 
 # 3. Select all and convert to Org
-Ctrl+X
-Type "h"
-Sleep 1s
 Alt+x
 Sleep 500ms
 Type "ascii-tree-to-org"
@@ -76,13 +73,10 @@ Type "*** dto.go"
 Sleep 2s
 
 # 5. Select all and convert back to an ASCII tree
-Ctrl+X
-Type "h"
-Sleep 1s
 Alt+x
 Sleep 500ms
 Type "ascii-tree-from-org"
 Enter
 
 # Pause to admire the pixel-perfect generated ASCII tree with comments!
-Sleep 5s
+Sleep 6s
